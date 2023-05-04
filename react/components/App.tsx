@@ -1,24 +1,23 @@
-import React, { useRef, useState } from "react"
-import { AppBar, Box, Button, CssBaseline, Divider, Stack, Toolbar, Typography } from "@mui/material"
-import { Add } from "@mui/icons-material"
-import API from "../services/electronApiService"
-import AddFeedDialog from "./AddFeedDialog"
-import { Output, Item } from "rss-parser"
-import FeedList from "./FeedList"
-import ItemList from "./ItemList"
+import React, { useRef, useState } from 'react'
+import { AppBar, Box, Button, CssBaseline, Divider, Stack, Toolbar, Typography } from '@mui/material'
+import { Add } from '@mui/icons-material'
+import API from '../services/electronApiService'
+import AddFeedDialog from './AddFeedDialog'
+import { type Output, type Item } from 'rss-parser'
+import FeedList from './FeedList'
+import ItemList from './ItemList'
 
 const testFeeds = [
-  "http://relay.fm/cortex/feed",
-  "https://uwsto.instructure.com/feeds/courses/enrollment_rVOwu98ONqcA2ZGfOppvQvq0M6qyC5zoN0cz3Tx9.atom",
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+  'http://relay.fm/cortex/feed',
+  'https://uwsto.instructure.com/feeds/courses/enrollment_rVOwu98ONqcA2ZGfOppvQvq0M6qyC5zoN0cz3Tx9.atom',
+  'https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw'
 ]
 
-export default function App(props: any): JSX.Element {
-
-  const [feeds, setFeeds] = useState<{
-    url: string,
+export default function App (props: any): JSX.Element {
+  const [feeds, setFeeds] = useState<Array<{
+    url: string
     data: Output<Item>
-  }[]>([])
+  }>>([])
   const [feed, setFeed] = useState<Output<Item> | null>(null)
   const [activeItem, setActiveItem] = useState<Item | null>(null)
 
@@ -29,11 +28,13 @@ export default function App(props: any): JSX.Element {
     const feedExists = feeds.findIndex((feed) => {
       if (feed.url === _url) {
         return true
+      } else {
+        return false
       }
     }) !== -1
 
     if (!feedExists) {
-      setFeeds([{url: _url, data: _data}, ...feeds])
+      setFeeds([{ url: _url, data: _data }, ...feeds])
       setAddFeedDialogOpen(false)
       return true
     } else {
@@ -41,11 +42,11 @@ export default function App(props: any): JSX.Element {
     }
   }
 
-  const handleFeedSelected = (feed: Output<Item>) => {
+  const handleFeedSelected = (feed: Output<Item>): void => {
     setFeed(feed)
   }
 
-  const handleItemSelected = (item: Item) => {
+  const handleItemSelected = (item: Item): void => {
     setActiveItem(item)
     console.log(item)
   }
@@ -54,33 +55,33 @@ export default function App(props: any): JSX.Element {
     if (activeItem !== null) {
       // add custom types to weird rss feed (such as youtube/relayfm)
       const displayItem = activeItem as (Item & {
-        id: string,
-        "content:encoded" : string,
+        id: string
+        'content:encoded': string
         enclosure: {
-          type: string,
+          type: string
           url: string
         }
         itunes: {
-          image: string,
+          image: string
         }
       })
 
       if (
-        displayItem.link?.includes('youtube.com')
+        displayItem.link?.includes('youtube.com') ?? false
       ) {
         // YouTube Video
         const ytId = displayItem.id.split(':')[2]
         return (
           <>
             <Stack sx={{
-              height: "100%",
-              justifyContent: "center"
+              height: '100%',
+              justifyContent: 'center'
             }}>
               <iframe
                 style={{
-                  width: "100%",
-                  height: "80%",
-                  border: "none"
+                  width: '100%',
+                  height: '80%',
+                  border: 'none'
                 }}
                 src={`https://www.youtube-nocookie.com/embed/${ytId}`}
                 title="YouTube video player"
@@ -90,65 +91,63 @@ export default function App(props: any): JSX.Element {
           </>
         )
       } else if (
-        displayItem.link?.includes('relay.fm')
+        displayItem.link?.includes('relay.fm') ?? false
       ) {
         // RelayFM Feed
         if (audioRef.current !== null) {
-          audioRef.current?.pause();
-          audioRef.current?.load();
+          audioRef.current?.pause()
+          audioRef.current?.load()
         }
-        return  (
+        return (
           <>
             <audio ref={audioRef} controls style={{
-              width: "100%"
+              width: '100%'
             }}>
               <source src={displayItem.enclosure?.url} type={displayItem.enclosure?.type} />
               Your browser does not support the audio element.
             </audio>
-            <p dangerouslySetInnerHTML={{ __html: displayItem['content:encoded'] ?? ""}}></p>
+            <p dangerouslySetInnerHTML={{ __html: displayItem['content:encoded'] ?? '' }}></p>
           </>
         )
       } else {
         // Raw Content otherwise
-        return (<div dangerouslySetInnerHTML={{ __html : (activeItem.content ?? activeItem.contentSnippet) ?? "Could not find content."}}></div>)
+        return (<div dangerouslySetInnerHTML={{ __html: (activeItem.content ?? activeItem.contentSnippet) ?? 'Could not find content.' }}></div>)
       }
     }
     if (feeds.length === 0) {
       return <>Add A Feed</>
-    }
-    else if (feed === null) {
+    } else if (feed === null) {
       return <>Select A Feed</>
-    }
-    else {
+    } else {
       return <>Select A Feed Item</>
     }
   }
 
-  const getKeyValuePairs = (obj: Item | Object | null): JSX.Element => {
+  const getKeyValuePairs = (obj: Item | any | null): JSX.Element => {
     if (obj !== null) {
       return (
-        <div style={{wordWrap: "break-word"}}>
+        <div style={{ wordWrap: 'break-word' }}>
           {Object.keys(obj ?? {}).map((key, index) => {
             return (
               <div key={index}>
-                <Divider sx={{my: 1}} />
-                <div style={{ paddingLeft: "1.5em" }} >
-                  <span style={{ fontWeight: "bold" }}>{key}: </span>
-                  {typeof obj[key] === "object"
-                  ? (
-                    getKeyValuePairs(obj[key])
-                  )
-                  : (
-                    <span>
-                      {obj[key].indexOf("http") === 0
-                      ? (
-                        <a href={obj[key]} target="_blank">{obj[key]}</a>
+                <Divider sx={{ my: 1 }} />
+                <div style={{ paddingLeft: '1.5em' }} >
+                  <span style={{ fontWeight: 'bold' }}>{key}: </span>
+                  {typeof obj[key] === 'object'
+                    ? (
+                        getKeyValuePairs(obj[key])
                       )
-                      : (
+                    : (
+                    <span>
+                      {obj[key].indexOf('http') === 0
+                        ? (
+                        <a href={obj[key]} target="_blank" rel="noreferrer">{obj[key]}</a>
+                          )
+                        : (
                         <span>{obj[key]}</span>
-                      )}
+                          )}
                     </span>
-                  )}
+                      )}
                 </div>
               </div>
             )
@@ -160,7 +159,7 @@ export default function App(props: any): JSX.Element {
   }
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <CssBaseline />
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
@@ -170,25 +169,25 @@ export default function App(props: any): JSX.Element {
             <Button
               variant="outlined"
               sx={{
-                color: "white",
-                borderColor: "white",
-                ":hover": {
-                  color: "black",
-                  bgcolor: "white",
+                color: 'white',
+                borderColor: 'white',
+                ':hover': {
+                  color: 'black',
+                  bgcolor: 'white'
                 }
               }}
-              onClick={async () => {
-                const getTestData = async () => {
-                  const t =  testFeeds.map(async (_url) => {
+              onClick={() => {
+                const getTestData = async (): Promise<void> => {
+                  const t = testFeeds.map(async (_url) => {
                     return {
                       url: _url,
                       data: await API.rssParseUrl(_url)
                     }
                   })
                   const newData = await Promise.all(t)
-                  return newData
+                  setFeeds([...newData, ...feeds])
                 }
-                setFeeds([...await getTestData(), ...feeds])
+                void getTestData()
               }}
               disabled={ testFeeds.every((f) => feeds.map((feed) => feed.url).includes(f)) }
             >
@@ -197,20 +196,20 @@ export default function App(props: any): JSX.Element {
           </Stack>
         </Toolbar>
       </AppBar>
-      <Stack sx={{ flexGrow: 1, overflow: "hidden" }} direction="column">
+      <Stack sx={{ flexGrow: 1, overflow: 'hidden' }} direction="column">
         <Toolbar />
-        <Stack sx={{ flexGrow: 1, overflow: "hidden" }} direction="row">
+        <Stack sx={{ flexGrow: 1, overflow: 'hidden' }} direction="row">
           <Box
             sx={{
-              borderRight: "1px solid gray",
-              minWidth: "20%",
-              overflow: "auto"
+              borderRight: '1px solid gray',
+              minWidth: '20%',
+              overflow: 'auto'
             }}
           >
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "center"
+                display: 'flex',
+                justifyContent: 'center'
               }}
             >
               <Button
@@ -238,10 +237,10 @@ export default function App(props: any): JSX.Element {
           </Box>
           <Box
             sx={{
-              borderRight: "1px solid gray",
-              minWidth: "25%",
-              width: "25%",
-              overflow: "auto"
+              borderRight: '1px solid gray',
+              minWidth: '25%',
+              width: '25%',
+              overflow: 'auto'
             }}
           >
             <ItemList
@@ -250,7 +249,7 @@ export default function App(props: any): JSX.Element {
               itemSelected={activeItem}
             />
           </Box>
-          <Box sx={{ flexGrow: 1, overflowY: "auto", padding: 1 }}>
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', padding: 1 }}>
             <>
               {getItemContent()}
             </>

@@ -1,12 +1,11 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, DialogContentText, TextField, Box, Divider, Grid, List, ListItem, Accordion, AccordionSummary, AccordionDetails, Chip, Typography } from "@mui/material"
-import React, { useEffect, useRef, useState } from "react"
-import API from "../services/electronApiService"
-import { Output, Item } from "rss-parser"
-import { ArrowForwardIos } from "@mui/icons-material"
-import { ExpandMore } from "@mui/icons-material"
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Divider, Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
+import API from '../services/electronApiService'
+import { type Output, type Item } from 'rss-parser'
+import { ExpandMore } from '@mui/icons-material'
 
-export default function AddFeedDialog(props: any) {
-  const { onClose, open, onAddFeed} = props
+export default function AddFeedDialog (props: any): JSX.Element {
+  const { onClose, open, onAddFeed } = props
 
   const urlField = useRef<HTMLInputElement>()
   const [feedUrl, setFeedUrl] = useState('')
@@ -14,31 +13,31 @@ export default function AddFeedDialog(props: any) {
   const [feedError, setFeedError] = useState('')
   const [activeAccordionIndex, setActiveAccordionIndex] = useState<number>(-1)
 
-  const getFeed = async (purpose: string) => {
+  const getFeed = async (purpose: string): Promise<void> => {
     // get the preview of a feed
     if (feedUrl !== null && feedUrl !== '') {
       let url = feedUrl
-      if (feedUrl.indexOf("http") !== 0) {
-        url = "https://" + feedUrl
+      if (feedUrl.indexOf('http') !== 0) {
+        url = 'https://' + feedUrl
         setFeedUrl(url)
       }
-      const response = await API.rssParseUrl(url);
+      const response = await API.rssParseUrl(url)
       console.log(response)
-      if (response.error) {
-        setFeedError("Could not retrieve: \"" + url + "\"")
+      if (response.error !== null && response.error !== undefined) {
+        setFeedError('Could not retrieve: "' + url + '"')
       } else {
-        if (purpose === "preview") {
+        if (purpose === 'preview') {
           setFeedData(response)
-        } else if (purpose === "add") {
-          if (!onAddFeed(url, response)) {
-            setFeedError("Feed Already Exists")
+        } else if (purpose === 'add') {
+          if (onAddFeed(url, response) === true) {
+            setFeedError('Feed Already Exists')
           }
         }
       }
     }
   }
 
-  const handleCloseAfterTransition = () => {
+  const handleCloseAfterTransition = (): void => {
     // reset the state when the dialog is closed
     setFeedUrl('')
     setFeedError('')
@@ -62,27 +61,27 @@ export default function AddFeedDialog(props: any) {
         onExited: handleCloseAfterTransition
       }}
       fullWidth={true}
-      maxWidth={"md"}
+      maxWidth={'md'}
     >
       <DialogTitle>Add an RSS Feed</DialogTitle>
       <DialogContent
         sx={{
-          display: "flex",
-          flexDirection: "column"
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
-        <Box sx={{ display: "flex", flexShrink: 1 }}>
+        <Box sx={{ display: 'flex', flexShrink: 1 }}>
           <TextField
             fullWidth
             label="Feed URL"
             variant="standard"
             value={feedUrl}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setFeedUrl(event.target.value);
+              setFeedUrl(event.target.value)
             }}
             onKeyUp={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (event.key === 'Enter' || event.keyCode === 13) {
-                getFeed("preview")
+                void getFeed('preview')
               }
             }}
             autoFocus
@@ -108,12 +107,12 @@ export default function AddFeedDialog(props: any) {
         </Box>
         {feedData !== null && (
           <>
-            <Box sx={{my: 1, display: "flex", flexDirection: "row", flexWrap: "nowrap"}}>
+            <Box sx={{ my: 1, display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }}>
               {getFeedImage() !== '' &&
-                <img src={getFeedImage()} style={{maxHeight: "10em"}}/>
+                <img src={getFeedImage()} style={{ maxHeight: '10em' }}/>
               }
-              <Box sx={{display: "flex", flexDirection: "column", px: 1}}>
-                <Typography sx={{fontSize: "2em"}}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', px: 1 }}>
+                <Typography sx={{ fontSize: '2em' }}>
                   {feedData.title}
                 </Typography>
                 <Typography>
@@ -121,8 +120,8 @@ export default function AddFeedDialog(props: any) {
                 </Typography>
               </Box>
             </Box>
-            <Divider sx={{my: 1}} />
-            <Box sx={{ flexGrow: 1, overflow: "auto"}}>
+            <Divider sx={{ my: 1 }} />
+            <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
               {feedData.items.map((feedItem, index) => {
                 return (
                   <Accordion
@@ -151,8 +150,8 @@ export default function AddFeedDialog(props: any) {
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant="text" onClick={() => { getFeed("preview") }}>Preview</Button>
-        <Button variant="text" onClick={() => { getFeed("add") }}>Add</Button>
+        <Button variant="text" onClick={() => { void getFeed('preview') }}>Preview</Button>
+        <Button variant="text" onClick={() => { void getFeed('add') }}>Add</Button>
         <Button variant="text" onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
