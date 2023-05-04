@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import API from '../services/electronApiService'
 import { type Output, type Item } from 'rss-parser'
 import { ExpandMore } from '@mui/icons-material'
+import RssItemKeyValues from './RssItemKeyValues'
 
 export default function AddFeedDialog (props: any): JSX.Element {
   const { onClose, open, onAddFeed } = props
@@ -140,7 +141,7 @@ export default function AddFeedDialog (props: any): JSX.Element {
                       {feedItem.title}
                     </AccordionSummary>
                     <AccordionDetails>
-                      Item Details
+                      <RssItemKeyValues obj={feedItem} truncateLength={300}/>
                     </AccordionDetails>
                   </Accordion>
                 )

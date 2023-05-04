@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react'
-import { AppBar, Box, Button, CssBaseline, Divider, Stack, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, CssBaseline, Stack, Toolbar, Typography } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import API from '../services/electronApiService'
 import AddFeedDialog from './AddFeedDialog'
 import { type Output, type Item } from 'rss-parser'
 import FeedList from './FeedList'
 import ItemList from './ItemList'
+import RssItemKeyValues from './RssItemKeyValues'
 
 const testFeeds = [
   'http://relay.fm/cortex/feed',
@@ -123,41 +124,6 @@ export default function App (props: any): JSX.Element {
     }
   }
 
-  const getKeyValuePairs = (obj: Item | any | null): JSX.Element => {
-    if (obj !== null) {
-      return (
-        <div style={{ wordWrap: 'break-word' }}>
-          {Object.keys(obj ?? {}).map((key, index) => {
-            return (
-              <div key={index}>
-                <Divider sx={{ my: 1 }} />
-                <div style={{ paddingLeft: '1.5em' }} >
-                  <span style={{ fontWeight: 'bold' }}>{key}: </span>
-                  {typeof obj[key] === 'object'
-                    ? (
-                        getKeyValuePairs(obj[key])
-                      )
-                    : (
-                    <span>
-                      {obj[key].indexOf('http') === 0
-                        ? (
-                        <a href={obj[key]} target="_blank" rel="noreferrer">{obj[key]}</a>
-                          )
-                        : (
-                        <span>{obj[key]}</span>
-                          )}
-                    </span>
-                      )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )
-    }
-    return <></>
-  }
-
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <CssBaseline />
@@ -254,9 +220,7 @@ export default function App (props: any): JSX.Element {
               {getItemContent()}
             </>
             <br />
-            <>
-              {getKeyValuePairs(activeItem)}
-            </>
+            <RssItemKeyValues obj={activeItem}/>
           </Box>
         </Stack>
       </Stack>
