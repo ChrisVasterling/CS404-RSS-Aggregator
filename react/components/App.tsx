@@ -209,9 +209,12 @@ export default function App (props: any): JSX.Element {
               overflow: 'auto'
             }}
           >
-            <Box sx={{ bgcolor: 'lightgrey' }}>
-              Feed Controls (refresh, feed filters, etc.)
-            </Box>
+            <Stack sx={{ bgcolor: 'lightgrey', alignItems: 'center' }} direction={'row'}>
+              <Typography>Dummy Buttons:</Typography>
+              <Button>Refresh</Button>
+              <Button>Filter</Button>
+              <Button>Feed Settings</Button>
+            </Stack>
             <ItemList
               items={feed?.items ?? []}
               onItemSelected={handleItemSelected}
@@ -219,8 +222,10 @@ export default function App (props: any): JSX.Element {
             />
           </Box>
           <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-            <Stack sx={{ bgcolor: 'lightgrey' }}>
-              Item Controls (mark as read, download/save, etc.)
+            <Stack sx={{ bgcolor: 'lightgrey', alignItems: 'center' }} direction={'row'}>
+              <Typography>Dummy Buttons:</Typography>
+              <Button>Mark As Read</Button>
+              <Button>Save for Later</Button>
             </Stack>
             <Box sx={{ padding: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               <>
