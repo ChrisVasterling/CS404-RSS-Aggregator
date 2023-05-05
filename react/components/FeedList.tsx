@@ -9,13 +9,22 @@ export default function FeedList (props: {
 
 }): JSX.Element {
   const { feeds, onFeedSelected, feedSelected } = props
+
+  const sortFeeds = (a: Output<Item>, b: Output<Item>): number => {
+    if (a?.title !== undefined && b?.title !== undefined) {
+      return a.title < b.title ? -1 : 1
+    } else {
+      return 0
+    }
+  }
+
   return (
     <>
       {feeds.length > 0 && (
         <Divider sx={{ my: 1 }} />
       )}
       <List disablePadding>
-        {feeds.map((feed, index) => {
+        {feeds.sort(sortFeeds).map((feed, index) => {
           return (
             <ListItem key={index} disableGutters disablePadding
               sx={{

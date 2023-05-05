@@ -116,11 +116,11 @@ export default function App (props: any): JSX.Element {
       }
     }
     if (feeds.length === 0) {
-      return <>Add A Feed</>
+      return <p style={{ fontWeight: 'bold' }} >Add A Feed</p>
     } else if (feed === null) {
-      return <>Select A Feed</>
+      return <p style={{ fontWeight: 'bold' }} >Select A Feed</p>
     } else {
-      return <>Select A Feed Item</>
+      return <p style={{ fontWeight: 'bold' }} >Select A Feed Item</p>
     }
   }
 
@@ -209,18 +209,26 @@ export default function App (props: any): JSX.Element {
               overflow: 'auto'
             }}
           >
+            <Box sx={{ bgcolor: 'lightgrey' }}>
+              Feed Controls (refresh, feed filters, etc.)
+            </Box>
             <ItemList
               items={feed?.items ?? []}
               onItemSelected={handleItemSelected}
               itemSelected={activeItem}
             />
           </Box>
-          <Box sx={{ flexGrow: 1, overflowY: 'auto', padding: 1 }}>
-            <>
-              {getItemContent()}
-            </>
-            <br />
-            <RssItemKeyValues obj={activeItem}/>
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <Stack sx={{ bgcolor: 'lightgrey' }}>
+              Item Controls (mark as read, download/save, etc.)
+            </Stack>
+            <Box sx={{ padding: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <>
+                {getItemContent()}
+              </>
+              <br />
+              <RssItemKeyValues obj={activeItem}/>
+            </Box>
           </Box>
         </Stack>
       </Stack>
