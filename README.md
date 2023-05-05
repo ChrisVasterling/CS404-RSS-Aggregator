@@ -14,3 +14,8 @@ My Final Project for CS-404 Adv. Web &amp; Internet Programming is a React+MUI+E
   - `npm run electron:stay` is useful in development as it relaunches the program if accidentally closed
 
 ## Learning Opportunities
+- Setting up ESLint for use with typescript
+- Using electron's `contextBridge` and `ipcRenderer` to setup a line of bidirectional communication between the front-end and electron's node environment
+  - This was needed since the `rss-parser` library must run in a node environment rather than client side
+- Knowing when the break down a piece of UI into its own component
+- Working with types and ensuring types match

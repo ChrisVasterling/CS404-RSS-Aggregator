@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron')
 const electronReload = require('electron-reload')
 const path = require('path')
 const { parseUrl } = require('./rss')
@@ -16,16 +16,26 @@ function createWindow () {
       preload: path.join(__dirname, './preload.js'),
       nodeIntegration: true,
       contextIsolation: true
-    }
+    },
+    show: false
   })
 
-  win.removeMenu()
+  const menu = new Menu()
+  const devTools = new MenuItem({
+    label: 'Toggle Developer Tools',
+    role: 'toggleDevTools'
+  })
+  menu.insert(0, devTools)
+  Menu.setApplicationMenu(menu)
 
   // load the index.html from a url
   win.loadFile('./build/index.html')
 
+  win.maximize()
+  win.show()
+
   // Open the DevTools.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
